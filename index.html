@@ -41,14 +41,14 @@
       --text:       #e6e6f0;
       --muted:      #7777aa;
       --border:     rgba(124, 92, 252, 0.22);*/
-      --bg:         #7c7e7e;
-      --bg-card:    #8e9191;
-      --accent:     #eeb9c7;
-      --accent2:    #dda0af;
-      --text:       #555568;
-      --muted:      #b9eedc;
-      --border:     #f3eded;
-
+      --bg:         #7c7e7e; /*grey dark - */
+      --bg-card:    #8e9191; /*grey light - main background*/
+      --accent:     #eeb9c7; /*pink light - text */
+      --accent2:    #dda0af; /*pink dark - */
+      --text:       #555568; /*blueish grey dark - headlines*/
+      --muted:      #b9eedc; /*mint - text*/
+      --border:     #f3eded; /*whiteish - */
+      --color-nav:  #eeb9c7;
     }
 
     html { scroll-behavior: smooth; }
@@ -66,7 +66,7 @@
       padding: 1.1rem 5vw;
       display: flex; justify-content: space-between; align-items: center;
       backdrop-filter: blur(18px) saturate(1.4);
-      background: rgba(8, 8, 15, 0.75);
+      background: color: var(--color-nav);
       border-bottom: 1px solid var(--border);
       transition: background 0.4s;
     }
