@@ -482,22 +482,40 @@
   }
 
   // Optionaler Wireframe-Overlay über alle Meshes eines geladenen Modells
-  function addWireframeOverlay(model, color = 0x00e5ff) {
-    model.traverse(child => {
-      if (child.isMesh) {
-        const wire = new THREE.Mesh(
-          child.geometry,
-          new THREE.MeshBasicMaterial({
-            color,
-            wireframe:   true,
-            transparent: true,
-            opacity:     0.12
-          })
-        );
-        child.add(wire);
-      }
-    });
-  }
+// Diese alte Funktion löschen:
+/*function addWireframeOverlay(model, color = 0x00e5ff) {
+  model.traverse(child => {
+    if (child.isMesh) {
+      const wire = new THREE.Mesh(   // ← sofort von traverse besucht → crash
+        child.geometry,
+        new THREE.MeshBasicMaterial({ color, wireframe: true, transparent: true, opacity: 0.12 })
+      );
+      child.add(wire);
+    }
+  });
+}*/
+
+// Durch diese ersetzen:
+function addWireframeOverlay(model, color = 0x00e5ff) {
+  const meshes = [];
+  // Schritt 1: traverse nur zum Sammeln — NICHTS hinzufügen
+  model.traverse(child => {
+    if (child.isMesh) meshes.push(child);
+  });
+  // Schritt 2: NACH dem traverse sicher hinzufügen
+  meshes.forEach(child => {
+    child.add(new THREE.Mesh(
+      child.geometry,
+      new THREE.MeshBasicMaterial({
+        color,
+        wireframe:   true,
+        transparent: true,
+        opacity:     0.12
+      })
+    ));
+  });
+}
+
 
   // ──────────────────────────────────────
   // 1) HERO-SZENE (Partikel + TorusKnot)
@@ -729,6 +747,7 @@
 
 </body>
 </html>
+
 
 
 
