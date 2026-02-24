@@ -422,253 +422,303 @@
   <!-- ══════════════════════════════════════
        THREE.JS — alle Szenen
   ══════════════════════════════════════ -->
-  <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { GLTFLoader }    from 'three/addons/loaders/GLTFLoader.js';
+  import { DRACOLoader }   from 'three/addons/loaders/DRACOLoader.js';
 
-    // ──────────────────────────────────────
-    // Hilfsfunktion: Renderer + Resize-Observer
-    // ──────────────────────────────────────
-    function makeRenderer(canvas, clearColor = 0x000000, clearAlpha = 0) {
-      const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-      r.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      r.outputColorSpace = THREE.SRGBColorSpace;
-      if (clearAlpha === 1) r.setClearColor(clearColor, 1);
-      return r;
-    }
+  // ──────────────────────────────────────
+  // Globaler DRACOLoader (einmal, für alle Szenen)
+  // ──────────────────────────────────────
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath(
+    'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/'
+  );
+  dracoLoader.preload(); // Decoder vorab laden → schnellere erste Load-Zeit
 
-    function watchResize(container, renderer, camera) {
-      new ResizeObserver(entries => {
-        const { width, height } = entries[0].contentRect;
-        renderer.setSize(width, height);
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-      }).observe(container);
-      // Initialgröße
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      camera.aspect = container.clientWidth / container.clientHeight;
+  const gltfLoader = new GLTFLoader();
+  gltfLoader.setDRACOLoader(dracoLoader);
+
+  // ──────────────────────────────────────
+  // Hilfsfunktionen
+  // ──────────────────────────────────────
+  function makeRenderer(canvas, clearColor = 0x000000, clearAlpha = 0) {
+    const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    r.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    r.outputColorSpace = THREE.SRGBColorSpace;
+    if (clearAlpha === 1) r.setClearColor(clearColor, 1);
+    return r;
+  }
+
+  function watchResize(container, renderer, camera) {
+    new ResizeObserver(entries => {
+      const { width, height } = entries[0].contentRect;
+      renderer.setSize(width, height);
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
-    }
+    }).observe(container);
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+  }
 
-    // ──────────────────────────────────────
-    // 1) HERO-SZENE
-    // ──────────────────────────────────────
-    const heroCanvas = document.getElementById('hero-canvas');
-    const heroRenderer = makeRenderer(heroCanvas);
-    heroRenderer.setSize(window.innerWidth, window.innerHeight);
+  // Modell automatisch zentrieren & auf einheitliche Größe skalieren
+  function normalizeModel(model, targetSize = 2.5) {
+    const box    = new THREE.Box3().setFromObject(model);
+    const center = box.getCenter(new THREE.Vector3());
+    const size   = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    model.position.sub(center);
+    model.scale.setScalar(targetSize / maxDim);
+  }
 
-    const heroScene  = new THREE.Scene();
-    const heroCamera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
-    heroCamera.position.set(0, 0, 6);
-
-    // Partikel-System
-    const N = 2500;
-    const pos = new Float32Array(N * 3);
-    for (let i = 0; i < N * 3; i++) pos[i] = (Math.random() - .5) * 22;
-    const pGeo = new THREE.BufferGeometry();
-    pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const particles = new THREE.Points(
-      pGeo,
-      new THREE.PointsMaterial({ color: 0x7c5cfc, size: .045, transparent: true, opacity: .55 })
-    );
-    heroScene.add(particles);
-
-    // Haupt-Objekt: TorusKnot (rechts)
-    const tkGeo = new THREE.TorusKnotGeometry(1.25, 0.36, 220, 32);
-    const tkMesh = new THREE.Mesh(tkGeo,
-      new THREE.MeshStandardMaterial({ color: 0x7c5cfc, roughness: .3, metalness: .6 })
-    );
-    tkMesh.position.set(3.8, 0, 0);
-    heroScene.add(tkMesh);
-
-    // Wireframe-Overlay
-    const tkWire = new THREE.Mesh(tkGeo,
-      new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: .08 })
-    );
-    tkWire.position.copy(tkMesh.position);
-    heroScene.add(tkWire);
-
-    // Lichter
-    heroScene.add(new THREE.AmbientLight(0xffffff, .5));
-    const hl1 = new THREE.DirectionalLight(0x7c5cfc, 2.5);
-    hl1.position.set(5, 5, 5);
-    heroScene.add(hl1);
-    const hl2 = new THREE.PointLight(0x00e5ff, 3, 25);
-    hl2.position.set(-6, 3, 3);
-    heroScene.add(hl2);
-
-    window.addEventListener('resize', () => {
-      heroCamera.aspect = window.innerWidth / window.innerHeight;
-      heroCamera.updateProjectionMatrix();
-      heroRenderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    function animHero(ts) {
-      requestAnimationFrame(animHero);
-      const t = ts * .001;
-      tkMesh.rotation.x = t * .28;
-      tkMesh.rotation.y = t * .46;
-      tkWire.rotation.copy(tkMesh.rotation);
-      particles.rotation.y = t * .04;
-      particles.rotation.x = t * .015;
-      heroRenderer.render(heroScene, heroCamera);
-    }
-    animHero(0);
-
-
-    // ──────────────────────────────────────
-    // 2) WORK-CARDS – wiederverwendbare Fabrik
-    // ──────────────────────────────────────
-    function buildWorkScene(containerId, geometry, mainColor, wireColor) {
-      const container = document.getElementById(containerId);
-      const canvas = document.createElement('canvas');
-      // canvas vor dem hint einfügen
-      container.insertBefore(canvas, container.firstChild);
-
-      const renderer = makeRenderer(canvas, 0x10101a, 1);
-      const scene    = new THREE.Scene();
-      scene.background = new THREE.Color(0x10101a);
-
-      const camera   = new THREE.PerspectiveCamera(48, 1, .1, 100);
-      camera.position.z = 3.6;
-      watchResize(container, renderer, camera);
-
-      const controls = new OrbitControls(camera, canvas);
-      controls.enableDamping  = true;
-      controls.dampingFactor  = .07;
-      controls.enablePan      = false;
-      controls.enableZoom     = false;
-      //controls.minDistance    = 2;
-      //controls.maxDistance    = 8;
-
-      const mesh = new THREE.Mesh(geometry,
-        new THREE.MeshStandardMaterial({ color: mainColor, roughness: .35, metalness: .55 })
-      );
-      const wire = new THREE.Mesh(geometry,
-        new THREE.MeshBasicMaterial({ color: wireColor, wireframe: true, transparent: true, opacity: .14 })
-      );
-      scene.add(mesh, wire);
-
-      scene.add(new THREE.AmbientLight(0xffffff, .5));
-      const dl = new THREE.DirectionalLight(0xffffff, 1.8);
-      dl.position.set(4, 4, 4); scene.add(dl);
-      const pl = new THREE.PointLight(wireColor, 3, 18);
-      pl.position.set(-4, 2, -2); scene.add(pl);
-
-      // Auto-Rotation stoppen sobald User interagiert
-      let autoRot = true;
-      const hint  = container.querySelector('.drag-hint');
-      canvas.addEventListener('pointerdown', () => {
-        autoRot = false;
-        if (hint) hint.style.opacity = '0';
-      }, { once: true });
-
-      function anim(ts) {
-        requestAnimationFrame(anim);
-        if (autoRot) {
-          mesh.rotation.y += .006;
-          mesh.rotation.x += .002;
-          wire.rotation.copy(mesh.rotation);
-        }
-        controls.update();
-        renderer.render(scene, camera);
+  // Optionaler Wireframe-Overlay über alle Meshes eines geladenen Modells
+  function addWireframeOverlay(model, color = 0x00e5ff) {
+    model.traverse(child => {
+      if (child.isMesh) {
+        const wire = new THREE.Mesh(
+          child.geometry,
+          new THREE.MeshBasicMaterial({
+            color,
+            wireframe:   true,
+            transparent: true,
+            opacity:     0.12
+          })
+        );
+        child.add(wire);
       }
-      anim(0);
+    });
+  }
+
+  // ──────────────────────────────────────
+  // 1) HERO-SZENE (Partikel + TorusKnot)
+  // ──────────────────────────────────────
+  const heroCanvas   = document.getElementById('hero-canvas');
+  const heroRenderer = makeRenderer(heroCanvas);
+  heroRenderer.setSize(window.innerWidth, window.innerHeight);
+
+  const heroScene  = new THREE.Scene();
+  const heroCamera = new THREE.PerspectiveCamera(
+    60, window.innerWidth / window.innerHeight, 0.1, 100
+  );
+  heroCamera.position.set(0, 0, 6);
+
+  // Partikel
+  const N   = 2500;
+  const pos = new Float32Array(N * 3);
+  for (let i = 0; i < N * 3; i++) pos[i] = (Math.random() - .5) * 22;
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  const particles = new THREE.Points(pGeo,
+    new THREE.PointsMaterial({ color: 0x7c5cfc, size: .045, transparent: true, opacity: .55 })
+  );
+  heroScene.add(particles);
+
+  // Haupt-Objekt
+  const tkGeo  = new THREE.TorusKnotGeometry(1.25, 0.36, 220, 32);
+  const tkMesh = new THREE.Mesh(tkGeo,
+    new THREE.MeshStandardMaterial({ color: 0x7c5cfc, roughness: .3, metalness: .6 })
+  );
+  tkMesh.position.set(3.8, 0, 0);
+  heroScene.add(tkMesh);
+
+  const tkWire = new THREE.Mesh(tkGeo,
+    new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: .08 })
+  );
+  tkWire.position.copy(tkMesh.position);
+  heroScene.add(tkWire);
+
+  heroScene.add(new THREE.AmbientLight(0xffffff, .5));
+  const hl1 = new THREE.DirectionalLight(0x7c5cfc, 2.5);
+  hl1.position.set(5, 5, 5); heroScene.add(hl1);
+  const hl2 = new THREE.PointLight(0x00e5ff, 3, 25);
+  hl2.position.set(-6, 3, 3); heroScene.add(hl2);
+
+  window.addEventListener('resize', () => {
+    heroCamera.aspect = window.innerWidth / window.innerHeight;
+    heroCamera.updateProjectionMatrix();
+    heroRenderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  function animHero(ts) {
+    requestAnimationFrame(animHero);
+    const t = ts * .001;
+    tkMesh.rotation.x = t * .28;
+    tkMesh.rotation.y = t * .46;
+    tkWire.rotation.copy(tkMesh.rotation);
+    particles.rotation.y = t * .04;
+    particles.rotation.x = t * .015;
+    heroRenderer.render(heroScene, heroCamera);
+  }
+  animHero(0);
+
+  // ──────────────────────────────────────
+  // 2) WORK-CARDS — GLB mit Draco
+  // ──────────────────────────────────────
+  function buildWorkScene(containerId, modelPath, wireColor = 0x00e5ff) {
+    const container = document.getElementById(containerId);
+    const canvas    = document.createElement('canvas');
+    container.insertBefore(canvas, container.firstChild);
+
+    const renderer = makeRenderer(canvas, 0x10101a, 1);
+    const scene    = new THREE.Scene();
+    scene.background = new THREE.Color(0x10101a);
+
+    const camera = new THREE.PerspectiveCamera(48, 1, .1, 100);
+    camera.position.z = 3.8;
+    watchResize(container, renderer, camera);
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enableDamping  = true;
+    controls.dampingFactor  = .07;
+    controls.enablePan      = false;
+    controls.enableZoom     = false; // Zoom deaktiviert
+
+    // Beleuchtung
+    scene.add(new THREE.AmbientLight(0xffffff, .5));
+    const dl = new THREE.DirectionalLight(0xffffff, 1.8);
+    dl.position.set(4, 4, 4); scene.add(dl);
+    const pl = new THREE.PointLight(wireColor, 3, 18);
+    pl.position.set(-4, 2, -2); scene.add(pl);
+
+    // Lade-Indikator
+    const hint = container.querySelector('.drag-hint');
+
+    // Loading-Overlay anzeigen bis Modell fertig
+    const loadOverlay = document.createElement('div');
+    loadOverlay.style.cssText = `
+      position:absolute; inset:0; display:flex;
+      align-items:center; justify-content:center;
+      background:rgba(16,16,26,0.85); color:#7777aa;
+      font-size:.78rem; letter-spacing:.1em; text-transform:uppercase;
+      pointer-events:none; transition:opacity .6s;
+    `;
+    loadOverlay.textContent = 'Loading…';
+    container.appendChild(loadOverlay);
+
+    let model    = null;
+    let autoRot  = true;
+
+    // GLB + Draco laden
+    gltfLoader.load(
+      modelPath,
+      (gltf) => {
+        model = gltf.scene;
+        normalizeModel(model, 2.5);
+        addWireframeOverlay(model, wireColor);
+        scene.add(model);
+
+        // Overlay ausblenden
+        loadOverlay.style.opacity = '0';
+        setTimeout(() => loadOverlay.remove(), 700);
+
+        // Interaktion → Auto-Rotation stoppen
+        canvas.addEventListener('pointerdown', () => {
+          autoRot = false;
+          if (hint) hint.style.opacity = '0';
+        }, { once: true });
+      },
+      (xhr) => {
+        if (xhr.total) {
+          const pct = Math.round(xhr.loaded / xhr.total * 100);
+          loadOverlay.textContent = `Loading… ${pct}%`;
+        }
+      },
+      (err) => {
+        console.error(`Fehler beim Laden von ${modelPath}:`, err);
+        loadOverlay.textContent = '⚠ Modell nicht gefunden';
+      }
+    );
+
+    function anim() {
+      requestAnimationFrame(anim);
+      if (model && autoRot) {
+        model.rotation.y += .006;
+      }
+      controls.update();
+      renderer.render(scene, camera);
     }
+    anim();
+  }
 
-    // Work 1 – TorusKnot
-    buildWorkScene('cw1',
-      new THREE.TorusKnotGeometry(.95, .3, 180, 28),
-      0x7c5cfc, 0x00e5ff
-    );
+  // ── Eigene Modelle einbinden ──
+  buildWorkScene('cw1', './models/werk1.glb', 0x00e5ff);
+  buildWorkScene('cw2', './models/werk2.glb', 0x7c5cfc);
+  buildWorkScene('cw3', './models/werk3.glb', 0xffa040);
 
-    // Work 2 – Icosahedron
-    buildWorkScene('cw2',
-      new THREE.IcosahedronGeometry(1.2, 4),
-      0x00b4cc, 0x7c5cfc
-    );
+  // ──────────────────────────────────────
+  // 3) ABOUT-SZENE
+  // ──────────────────────────────────────
+  const aWrap    = document.getElementById('about-canvas-wrap');
+  const aCanvas  = document.createElement('canvas');
+  aWrap.appendChild(aCanvas);
 
-    // Work 3 – Torus
-    buildWorkScene('cw3',
-      new THREE.TorusGeometry(1.05, .38, 40, 120),
-      0xd45cfc, 0xffa040
-    );
+  const aRenderer = makeRenderer(aCanvas, 0x0c0c1a, 1);
+  const aScene    = new THREE.Scene();
+  aScene.background = new THREE.Color(0x0c0c1a);
 
+  const aCamera = new THREE.PerspectiveCamera(50, 1, .1, 100);
+  aCamera.position.z = 5;
+  watchResize(aWrap, aRenderer, aCamera);
 
-    // ──────────────────────────────────────
-    // 3) ABOUT-SZENE
-    // ──────────────────────────────────────
-    const aWrap = document.getElementById('about-canvas-wrap');
-    const aCanvas = document.createElement('canvas');
-    aWrap.appendChild(aCanvas);
+  const aControls = new OrbitControls(aCamera, aCanvas);
+  aControls.enableDamping = true;
+  aControls.dampingFactor = .07;
+  aControls.enablePan     = false;
 
-    const aRenderer = makeRenderer(aCanvas, 0x0c0c1a, 1);
-    const aScene    = new THREE.Scene();
-    aScene.background = new THREE.Color(0x0c0c1a);
+  const aGroup = new THREE.Group();
+  aGroup.add(new THREE.Mesh(
+    new THREE.SphereGeometry(1.05, 48, 48),
+    new THREE.MeshStandardMaterial({ color: 0x7c5cfc, roughness: .25, metalness: .7 })
+  ));
+  aGroup.add(new THREE.Mesh(
+    new THREE.SphereGeometry(1.45, 18, 18),
+    new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: .18 })
+  ));
 
-    const aCamera   = new THREE.PerspectiveCamera(50, 1, .1, 100);
-    aCamera.position.z = 5;
-    watchResize(aWrap, aRenderer, aCamera);
+  const ring1 = new THREE.Mesh(
+    new THREE.TorusGeometry(2.0, .025, 8, 140),
+    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .35 })
+  );
+  ring1.rotation.x = Math.PI / 2;
+  aGroup.add(ring1);
 
-    const aControls = new OrbitControls(aCamera, aCanvas);
-    aControls.enableDamping = true;
-    aControls.dampingFactor = .07;
-    aControls.enablePan     = false;
-    aControls.enableZoom     = false;
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(2.45, .018, 8, 140),
+    new THREE.MeshBasicMaterial({ color: 0x7c5cfc, transparent: true, opacity: .28 })
+  );
+  ring2.rotation.x = Math.PI / 3;
+  aGroup.add(ring2);
 
-    // Gruppen-Objekt: Kern-Sphäre + Ringe
-    const aGroup = new THREE.Group();
+  const ring3 = new THREE.Mesh(
+    new THREE.TorusGeometry(2.8, .012, 8, 140),
+    new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: .2 })
+  );
+  ring3.rotation.x = -Math.PI / 5;
+  aGroup.add(ring3);
 
-    aGroup.add(new THREE.Mesh(
-      new THREE.SphereGeometry(1.05, 48, 48),
-      new THREE.MeshStandardMaterial({ color: 0x7c5cfc, roughness: .25, metalness: .7 })
-    ));
-    aGroup.add(new THREE.Mesh(
-      new THREE.SphereGeometry(1.45, 18, 18),
-      new THREE.MeshBasicMaterial({ color: 0x00e5ff, wireframe: true, transparent: true, opacity: .18 })
-    ));
+  aScene.add(aGroup);
+  aScene.add(new THREE.AmbientLight(0xffffff, .4));
+  const aL1 = new THREE.DirectionalLight(0x7c5cfc, 2.5);
+  aL1.position.set(5, 5, 5); aScene.add(aL1);
+  const aL2 = new THREE.PointLight(0x00e5ff, 3, 25);
+  aL2.position.set(-5, -3, 4); aScene.add(aL2);
 
-    const ring1 = new THREE.Mesh(
-      new THREE.TorusGeometry(2.0, .025, 8, 140),
-      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .35 })
-    );
-    ring1.rotation.x = Math.PI / 2;
-    aGroup.add(ring1);
+  function animAbout(ts) {
+    requestAnimationFrame(animAbout);
+    const t = ts * .001;
+    aGroup.rotation.y  = t * .3;
+    ring1.rotation.z  += .003;
+    ring2.rotation.z  -= .002;
+    ring3.rotation.y  += .0015;
+    aControls.update();
+    aRenderer.render(aScene, aCamera);
+  }
+  animAbout(0);
 
-    const ring2 = new THREE.Mesh(
-      new THREE.TorusGeometry(2.45, .018, 8, 140),
-      new THREE.MeshBasicMaterial({ color: 0x7c5cfc, transparent: true, opacity: .28 })
-    );
-    ring2.rotation.x = Math.PI / 3;
-    aGroup.add(ring2);
+</script>
 
-    const ring3 = new THREE.Mesh(
-      new THREE.TorusGeometry(2.8, .012, 8, 140),
-      new THREE.MeshBasicMaterial({ color: 0x00e5ff, transparent: true, opacity: .2 })
-    );
-    ring3.rotation.x = -Math.PI / 5;
-    aGroup.add(ring3);
-
-    aScene.add(aGroup);
-
-    aScene.add(new THREE.AmbientLight(0xffffff, .4));
-    const aL1 = new THREE.DirectionalLight(0x7c5cfc, 2.5);
-    aL1.position.set(5, 5, 5);  aScene.add(aL1);
-    const aL2 = new THREE.PointLight(0x00e5ff, 3, 25);
-    aL2.position.set(-5, -3, 4); aScene.add(aL2);
-
-    function animAbout(ts) {
-      requestAnimationFrame(animAbout);
-      const t = ts * .001;
-      aGroup.rotation.y  = t * .3;
-      ring1.rotation.z  += .003;
-      ring2.rotation.z  -= .002;
-      ring3.rotation.y  += .0015;
-      aControls.update();
-      aRenderer.render(aScene, aCamera);
-    }
-    animAbout(0);
-
-  </script>
 </body>
 </html>
+
