@@ -432,9 +432,17 @@
   // Globaler DRACOLoader (einmal, für alle Szenen)
   // ──────────────────────────────────────
   const dracoLoader = new DRACOLoader();
-  dracoLoader.setDecoderPath(
+  // ALT (kann auf manchen Servern fehlschlagen):
+ /* dracoLoader.setDecoderPath(
     'https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/'
+  );*/
+
+// NEU (offizielle Google-CDN — zuverlässiger):
+  dracoLoader.setDecoderPath(
+    'https://www.gstatic.com/draco/versioned/decoders/1.5.7/'
   );
+
+
   dracoLoader.preload(); // Decoder vorab laden → schnellere erste Load-Zeit
 
   const gltfLoader = new GLTFLoader();
@@ -721,6 +729,7 @@
 
 </body>
 </html>
+
 
 
 
