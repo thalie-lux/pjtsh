@@ -93,7 +93,7 @@ main {
 }
 
 .post-title a:hover {
-  text-decoration: underline;
+  background: #f0ecef;
 }
 
 .post-date {
