@@ -92,7 +92,7 @@ main {
   color: #000;
 } */
 
-.post-title hover {
+.post-title div:hover {
   background: #f0ecef;
 }
 
