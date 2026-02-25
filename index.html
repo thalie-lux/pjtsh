@@ -10,7 +10,7 @@
 <body>
   <header class="site-header">
     <div class="site-header-inner">
-      <div class="brand">Preben</div>
+      <div class="brand">preben</div>
       <nav class="main-nav">
         <a href="#works">works</a>
         <a href="#about">about</a>
@@ -32,6 +32,15 @@
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, 'text/html');
         const article = doc.querySelector('article.post');
+
+        const body = article.querySelector('.post-body');
+        const maxChars = 200;
+
+        if (body.innerText.length > maxChars) {
+          const shortened = body.innerText.slice(0, maxChars).trimEnd();
+          body.innerHTML = `<p>${shortened} …</p>`;
+        }
+
         document.getElementById('main-content').innerHTML = article.outerHTML;
       });
   </script>
