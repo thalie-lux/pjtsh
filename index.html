@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body class="page-index">
   <header class="site-header">
     <div class="site-header-inner">
       <div class="brand">preben</div>
@@ -38,7 +38,7 @@
 
         if (body.innerText.length > maxChars) {
           const shortened = body.innerText.slice(0, maxChars).trimEnd();
-          body.innerHTML = `<p>${shortened} …</p>`;
+          body.innerHTML = `<p>${shortened} […]</p>`;
         }
 
         document.getElementById('main-content').innerHTML = article.outerHTML;

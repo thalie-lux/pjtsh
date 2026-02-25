@@ -99,7 +99,7 @@ main {
   padding: 20px 30px;
 }
 
-.post-title a:hover {
+.page-index .post-title a:hover {
   background: #f0ecef;
 }
 
