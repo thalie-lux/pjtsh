@@ -85,10 +85,10 @@ main {
   padding: 20px 30px;
   font-weight: 600;
   font-size: 20px;
+  text-decoration: none;
 }
 
 .post-title a {
-  text-decoration: none;
   color: #000;
 }
 
