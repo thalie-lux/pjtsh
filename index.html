@@ -29,7 +29,10 @@
     fetch('pages/reflektoskop.html')
       .then(res => res.text())
       .then(html => {
-        document.getElementById('main-content').innerHTML = html;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const article = doc.querySelector('article.post');
+        document.getElementById('main-content').innerHTML = article.outerHTML;
       });
   </script>
 </body>
