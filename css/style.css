@@ -103,6 +103,11 @@ main {
   background: #f0ecef;
 }
 
+.page-post .post-title a {
+  pointer-events: none;
+  cursor: default;
+}
+
 .post-date {
   width: 260px;
   border-left: 1px solid #000;
