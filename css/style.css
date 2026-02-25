@@ -88,9 +88,9 @@ main {
   text-decoration: none;
 }
 
-.post-title a {
+/* .post-title a {
   color: #000;
-}
+} */
 
 .post-title a:hover {
   background: #f0ecef;
