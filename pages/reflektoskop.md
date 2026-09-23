@@ -1,3 +1,9 @@
+---
+title: reflekto
+cover: markdown_assets/reflektoskop.jpg
+excerpt: (optional) Eigener Kurztext für die Works-Liste. Ohne diese Zeile werden automatisch die ersten ~200 Zeichen genommen.
+---
+
 ## information 
 
 - Title: Reflektoskop Scoptures 
@@ -34,7 +40,6 @@ The first proper deplyoment happened at my colloquium at the 14th April 2026 in 
 
 [Reflektoskop Youtube Video](https://www.youtube.com/watch?v=xS7-9J_DlcA) 
 
-The complete theses documentation can be requested via [pjtsh.de](www.pjtsh.de)
 
 Credits: 
 photo 1 - Lucca Vitters
