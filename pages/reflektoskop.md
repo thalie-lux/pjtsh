@@ -1,7 +1,7 @@
 ---
 title: Reflektoskop
+date: 2026-09-23
 cover: markdown_assets/ph-reflekt-1.jpg
-excerpt:
 ---
 
 **Reflektoskop** is a modular, reflective & kinetic light installation consisting of multiple fixtures called **Scoptures Nodes**. Which was inspired by the fast and harsh environment of professional stage lighting equipment and the cosmic vision and complexity of the James Webb Space Telescope.
