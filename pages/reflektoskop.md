@@ -1,5 +1,3 @@
-
-
 ## information 
 
 - Title: Reflektoskop Scoptures 
