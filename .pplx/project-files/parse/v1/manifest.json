@@ -1,0 +1,16 @@
+{
+  "manifest_version": 1,
+  "repo_id": "files-9a13f9f4cbd26cb3cb1c2cc0d01b1ab2",
+  "cell_id": "prod-use1-projectfiles",
+  "commit_sha": "418f2906e0719b63342f0814db1f1047316044c0",
+  "parent_commit_shas": [
+    "dceaa427f0c35189132e9578beb6887aa158cba5"
+  ],
+  "generated_at_ms": 1790173486523,
+  "last_hydrate_ms": 1790173486522,
+  "incremental": false,
+  "reconciled_source_paths": [],
+  "artifact_root": ".pplx/project-files/parse/v1/",
+  "sources": [],
+  "artifacts": []
+}

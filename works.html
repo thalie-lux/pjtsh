@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>preben</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/works.css">
 </head>
 
-<body class="page-index">
+<body class="page-works">
   <header class="site-header">
     <div class="site-header-inner">
       <div class="brand">preben</div>
@@ -19,57 +20,17 @@
     </div>
   </header>
 
-  <main>
-      <article class="post">
+  <main id="works-list" class="works-list">
+    <!-- Arbeiten werden hier automatisch aus pages/*.md geladen -->
+  </main>
 
-        <header class="post-header">
-          <div class="post-tab active" data-tab="about">About</div>
-          <div class="post-tab" data-tab="dates">Dates</div>
-          <div class="post-tab" data-tab="legal">Legal</div>
-        </header>
-
-        <div class="post-body tab-content" id="tab-about">
-          <p>Hier steht der About-Text.</p>
-        </div>
-
-        <div class="post-body tab-content" id="tab-dates" hidden>
-          <p>Hier stehen die Dates.</p>
-        </div>
-
-        <div class="post-body tab-content" id="tab-legal" hidden>
-          <p>Impressum<br>
-          Preben Hennemann <br>
-          Axstedter Straße 16 <br>
-          28239 Bremen <br>
-          preben.hennemann@gmail.com <br>
-          <br>
-          <br>
-          Datenschutz <br>
-          
-          </p>
-
-        </div>
-
-      </article>
-    </main>
-
-    <script src="scripts/main.js"></script>
-    <script>
-      const tabs = document.querySelectorAll('.post-tab');
-      const contents = document.querySelectorAll('.tab-content');
-
-      tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-          tabs.forEach(t => t.classList.remove('active'));
-          contents.forEach(c => c.hidden = true);
-
-          tab.classList.add('active');
-          document.getElementById('tab-' + tab.dataset.tab).hidden = false;
-        });
-      });
-    </script>
-
-  <script data-pplx-inline-edit>
+  <script src="scripts/vendor/marked.min.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/works.js"></script>
+  <script>
+    initWorks('works-list');
+  </script>
+<script data-pplx-inline-edit>
 (function () {
   if (window === window.top) return;
 
@@ -398,4 +359,4 @@
 
 
 </script></body>
-  </html>
+</html>
