@@ -5,9 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>preben</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/works.css">
+  <link rel="stylesheet" href="css/background.css">
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+  </script>
 </head>
 
 <body class="page-index">
+  <canvas id="bg-canvas"></canvas>
+
   <header class="site-header">
     <div class="site-header-inner">
       <a class="brand" href="index.html">preben</a>
@@ -20,6 +27,14 @@
   </header>
 
 <!-- Write here -->
+
+  <script src="scripts/vendor/marked.min.js"></script>
+  <script src="scripts/main.js"></script>
+  <script src="scripts/works.js"></script>
+  <script type="module" src="scripts/background.js"></script>
+  <script>
+    initWorks('main-content', { limit: 1 });
+  </script>
 
 </body>
 </html>
