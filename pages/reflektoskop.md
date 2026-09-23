@@ -1,19 +1,9 @@
 ---
-title: reflekto
-cover: markdown_assets/reflektoskop.jpg
-excerpt: (optional) Eigener Kurztext für die Works-Liste. Ohne diese Zeile werden automatisch die ersten ~200 Zeichen genommen.
+title: Reflektoskop
+cover: markdown_assets/ph-reflekt-1.jpg
+excerpt:
 ---
 
-## information 
-
-- Title: Reflektoskop Scoptures 
-- Category: Bachelor Project 
-- Student/s: Preben Hennemann 
-- Lecturer/s: Prof. Peter von Maydell, Prof. Ralf Baecker 
-- Year: SS 2026 
- 
-## text + images + videos 
- 
 **Reflektoskop** is a modular, reflective & kinetic light installation consisting of multiple fixtures called **Scoptures Nodes**. Which was inspired by the fast and harsh environment of professional stage lighting equipment and the cosmic vision and complexity of the James Webb Space Telescope.
  
 ![Reflektoskop-1](./markdown_assets/ph-reflekt-1.jpg)
