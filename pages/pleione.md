@@ -2,6 +2,7 @@
 title: Pleione
 date: 2024-12-15
 cover: markdown_assets/ph-pleione-7.jpg
+excerpt: The underlying Idea was to create a Console where Visitors of Music Events can have a playful interaction with the onsight Lighting Setup and to please the unwilling urge to push buttons ...
 ---
 
 ![Pleione-1](./markdown_assets/ph-pleione-1.jpg)
