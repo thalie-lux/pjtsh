@@ -26,7 +26,7 @@ developing the case and 3D printing it, as well as the final installation in an 
  
 ![Reflektoskop](./markdown_assets/ph-reflekt-5.jpg) 
 
-The first proper deplyoment happened at my colloquium at the 14th April 2026 in the Neu Bau (former "Bunker an'n Diek", "Krise") of the Zentrum für Kollektivkultur collective. As the Scopture Nodes where explicitly made for events, the colloquium was also organised as bar evening with music performances.
+The first proper deplyoment happened at my colloquium event ["Scopture: Raum - Licht- Refexion"](https://www.zfk-hb.de/#scopture-raum-licht-reflexion) at the 14th April 2026 in the Neu Bau (former "Bunker an'n Diek", "Krise") of the Zentrum für Kollektivkultur collective. As the Scopture Nodes where explicitly made for events, the colloquium was also organised as bar evening with music performances.
 
 [Reflektoskop Youtube Video](https://www.youtube.com/watch?v=xS7-9J_DlcA) 
 
