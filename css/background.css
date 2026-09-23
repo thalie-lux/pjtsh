@@ -1,0 +1,33 @@
+/*
+  css/background.css
+  ------------------------------------------------------------
+  Fixiert den Animations-Canvas als Hintergrund, sodass er beim
+  Scrollen der Seite nicht mitbewegt wird und stets den
+  gesamten Viewport ausfüllt.
+  ------------------------------------------------------------
+*/
+
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;        /* liegt hinter allem Content */
+  pointer-events: none; /* Klicks/Scrollen gehen "durch" den Canvas */
+  display: block;
+}
+
+/*
+  Wichtig: der eigentliche Seiteninhalt (header, main, footer etc.)
+  darf keinen eigenen opaken Hintergrund haben, sonst verdeckt er
+  die Animation. Falls deine bestehenden Elemente in style.css
+  einen background-color besitzen, dort transparent machen oder
+  entfernen, z.B.:
+
+  body.page-index,
+  .site-header,
+  main {
+    background: transparent;
+  }
+*/
